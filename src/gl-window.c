@@ -24,11 +24,13 @@ void DisplayFunc()
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
   glLoadIdentity();
 
-  glColor3d(1.0, 0.0, 0.0);
+  /* Camera location */
   glTranslated(0.0, 0.0, TranslateZ);
-
   glRotated(RotationX, 1.0, 0.0, 0.0);
   glRotated(RotationY, 0.0, 1.0, 0.0);
+
+  /* Scene objects */
+  glColor3d(1.0, 0.0, 0.0);
   glutWireTeapot(1.0);
 
   glutSwapBuffers();
@@ -55,7 +57,6 @@ void KeyboardFunc(unsigned char key, int x, int y)
   case '-': TranslateZ *= 1.1; break;
   case '=': TranslateZ /= 1.1; break;
   }
-
 }
 
 void SpecialFunc(int key, int x, int y)
@@ -74,19 +75,14 @@ int cv_launch(int argc, char **argv)
 {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
-
   glutInitWindowSize(WindowWidth, WindowHeight);
   glutInitWindowPosition(512, 0);
   WindowId = glutCreateWindow("NYU CAL-Vis");
-
   glutDisplayFunc(DisplayFunc);
   glutIdleFunc(IdleFunc);
   glutReshapeFunc(ReshapeFunc);
   glutKeyboardFunc(KeyboardFunc);
   glutSpecialFunc(SpecialFunc);
-
   glutMainLoop();
-
   return 0;
 }
-

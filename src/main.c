@@ -1,7 +1,6 @@
 
 #include <stdio.h>
-#include "../cow/cow.h"
-
+#include "cow.h"
 
 int cv_launch(int argc, char **argv);
 
@@ -10,11 +9,12 @@ int main(int argc, char **argv)
   cow_domain *domain = cow_domain_new();
   cow_dfield *dfield = cow_dfield_new();
 
-  cow_domain_setndim(domain, 3);
+  int err = cow_domain_readsize(domain, "chkpt.0500.h5", "prim/rho");
+  if (err) {
+    fprintf(stderr, "[calvis:error] input file was not found or invalid\n");
+    return 1;
+  }
   cow_domain_setguard(domain, 1);
-  cow_domain_setsize(domain, 0, 32);
-  cow_domain_setsize(domain, 1, 32);
-  cow_domain_setsize(domain, 2, 32);
   cow_domain_commit(domain);
 
   cow_dfield_setname(dfield, "prim");
@@ -25,6 +25,11 @@ int main(int argc, char **argv)
   cow_dfield_addmember(dfield, "pre");
   cow_dfield_setdomain(dfield, domain);
   cow_dfield_commit(dfield);
+
+  int nx = cow_domain_getsize(domain, 0);
+  int ny = cow_domain_getsize(domain, 1);
+  int nz = cow_domain_getsize(domain, 2);
+  printf("[calvis] read data file with size (%d %d %d)\n", nx, ny, nz);
 
   cow_dfield_read(dfield, "chkpt.0500.h5");
   cow_dfield_syncguard(dfield);
