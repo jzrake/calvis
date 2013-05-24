@@ -1,10 +1,15 @@
 
 #include <stdio.h>
-#include "cow.h"
-
-int cv_launch(int argc, char **argv);
+#include "calvis.h"
 
 int main(int argc, char **argv)
+{
+  cv_launch(argc, argv);
+  return 0;
+}
+
+
+int cv_build_scene()
 {
   cow_domain *domain = cow_domain_new();
   cow_dfield *dfield = cow_dfield_new();
@@ -18,11 +23,7 @@ int main(int argc, char **argv)
   cow_domain_commit(domain);
 
   cow_dfield_setname(dfield, "prim");
-  cow_dfield_addmember(dfield, "vx");
-  cow_dfield_addmember(dfield, "vy");
-  cow_dfield_addmember(dfield, "vz");
   cow_dfield_addmember(dfield, "rho");
-  cow_dfield_addmember(dfield, "pre");
   cow_dfield_setdomain(dfield, domain);
   cow_dfield_commit(dfield);
 
@@ -41,17 +42,16 @@ int main(int argc, char **argv)
   cow_dfield_sampleexecute(dfield);
   cow_dfield_getsampleresult(dfield, &sample_result, NULL, NULL);
 
-  printf("%f %f %f %f %f\n",
-	 sample_result[0],
-	 sample_result[1],
-	 sample_result[2],
-	 sample_result[3],
-	 sample_result[4]);
+  ImagePlane *img1 = cv_imageplane_new();
+  ImagePlane *img2 = cv_imageplane_new();
+  ImagePlane *img3 = cv_imageplane_new();
+
+  cv_imageplane_from3d(img1, dfield, 0, 0, nx/2);
+  cv_imageplane_from3d(img2, dfield, 0, 1, ny/2);
+  cv_imageplane_from3d(img3, dfield, 0, 2, 0);
 
   cow_dfield_del(dfield);
   cow_domain_del(domain);
-
-  cv_launch(argc, argv);
 
   return 0;
 }
