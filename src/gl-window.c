@@ -19,7 +19,7 @@ static void auto_scale(double *raw_data, int N, int mem, int nm, double data_cut
 static double scale(double z);
 static void get_rgb(double val, GLfloat rgb[3]);
 static int log_scale = 0;
-static int colorbar_id = 0;
+static int colorbar_id = 1;
 static int user_cuts = 0;
 
 static ImagePlane *ImagePlaneObjects[16];
@@ -48,22 +48,16 @@ void DisplayFunc()
 
   /* Camera location */
   glTranslated(0.0, 0.0, TranslateZ);
+
   glRotated(RotationX, 1.0, 0.0, 0.0);
   glRotated(RotationY, 0.0, 1.0, 0.0);
-
+  glRotated(-90.0, 1.0, 0.0, 0.0);
 
   for (int i=0; i<ImagePlaneObjectCount; ++i) {
     ImagePlane *I = ImagePlaneObjects[i];
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, I->id);
     glBegin(GL_QUADS);
-
-    /*
-    glTexCoord2f(0.f, 0.f); glVertex3d(-1.0,-1.0, 0.0);
-    glTexCoord2f(1.f, 0.f); glVertex3d( 1.0,-1.0, 0.0);
-    glTexCoord2f(1.f, 1.f); glVertex3d( 1.0, 1.0, 0.0);
-    glTexCoord2f(0.f, 1.f); glVertex3d(-1.0, 1.0, 0.0);
-    */
 
     glTexCoord2f(0.f, 0.f); glVertex3fv(I->X0);
     glTexCoord2f(1.f, 0.f); glVertex3fv(I->X1);
@@ -103,7 +97,7 @@ void KeyboardFunc(unsigned char key, int x, int y)
 
 void SpecialFunc(int key, int x, int y)
 {
-  double a = 2.0;
+  double a = 4.0;
   switch (key) {
   case GLUT_KEY_RIGHT: RotationY -= a; break;
   case GLUT_KEY_LEFT:  RotationY += a; break;
