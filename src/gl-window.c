@@ -13,7 +13,7 @@ int WindowHeight = 768;
 
 double RotationX = 0.0;
 double RotationY = 0.0;
-double TranslateZ = -5.0;
+double TranslateZ = -2.0;
 
 static void auto_scale(double *raw_data, int N, int mem, int nm, double data_cut[2]);
 static double scale(double z);
@@ -175,9 +175,10 @@ int cv_imageplane_from3d(ImagePlane *I, cow_dfield *f, int mem, int ax, int ind)
   I0[ax] = ng + ind;
   I1[ax] = ng + ind + 1;
 
-  int ntot = (I1[0] - I0[0]) * (I1[1] - I0[1]) * (I1[2] - I0[2]);
+  int ntotimg = (I1[0] - I0[0]) * (I1[1] - I0[1]) * (I1[2] - I0[2]);
+  int ntotsrc = cow_domain_getnumlocalzonesincguard(d, COW_ALL_DIMS);
   double *raw_data = cow_dfield_getdatabuffer(f);
-  GLfloat *texture_data = (GLfloat*) malloc(ntot * 3 * sizeof(GLfloat));
+  GLfloat *texture_data = (GLfloat*) malloc(ntotimg * 3 * sizeof(GLfloat));
   int i,j,k,m;
   int Nx, Ny;
   int nimage = 0;
@@ -185,7 +186,7 @@ int cv_imageplane_from3d(ImagePlane *I, cow_dfield *f, int mem, int ax, int ind)
   double min, max, z;
 
   if (!user_cuts) {
-    auto_scale(raw_data, ntot, mem, nm, data_cut);
+    auto_scale(raw_data, ntotsrc, mem, nm, data_cut);
   }
   min = data_cut[0];
   max = data_cut[1];
@@ -299,8 +300,8 @@ void auto_scale(double *raw_data, int N, int mem, int nm, double data_cut[2])
   int m;
   double z;
 
-  data_cut[0] = scale(raw_data[0]);
-  data_cut[1] = scale(raw_data[0]);
+  data_cut[0] = scale(raw_data[mem]);
+  data_cut[1] = scale(raw_data[mem]);
 
   for (m=0; m<N; ++m) {
     z = scale(raw_data[nm*m + mem]);
