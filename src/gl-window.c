@@ -24,6 +24,12 @@ static int user_cuts = 0;
 
 static ImagePlane *ImagePlaneObjects[16];
 static int ImagePlaneObjectCount = 0;
+static RenderScene *RenderSceneCurrent = NULL;
+
+struct RenderScene
+{
+  int (*KeyboardFunc)(unsigned char key, int x, int y);
+} ;
 
 struct ImagePlane
 {
@@ -34,6 +40,12 @@ struct ImagePlane
   GLfloat X2[3];
   GLfloat X3[3];
 } ;
+
+int cv_setcurrent_scene(RenderScene *S)
+{
+  RenderSceneCurrent = S;
+  return 0;
+}
 
 void IdleFunc()
 {
@@ -47,6 +59,7 @@ void DisplayFunc()
   glLoadIdentity();
 
   /* Camera location */
+  glTranslated(0.0,-1.0, 0.0);
   glTranslated(0.0, 0.0, TranslateZ);
 
   glRotated(RotationX, 1.0, 0.0, 0.0);
@@ -69,7 +82,6 @@ void DisplayFunc()
     glDisable(GL_TEXTURE_2D);
   }
 
-
   glutSwapBuffers();
 }
 
@@ -87,6 +99,11 @@ void ReshapeFunc(int Width, int Height)
 
 void KeyboardFunc(unsigned char key, int x, int y)
 {
+  /*
+  if (RenderSceneCurrent->KeyboardFunc) {
+    if (RenderSceneCurrent->KeyboardFunc(key, x, y)) return;
+  }
+  */
   switch (key) {
   case ESCAPE_KEY:
     exit(0);
@@ -127,6 +144,17 @@ int cv_launch(int argc, char **argv)
 }
 
 
+RenderScene *cv_renderscene_new()
+{
+  RenderScene *S = (RenderScene*) malloc(sizeof(RenderScene));
+  S->KeyboardFunc = NULL;
+  return S;
+}
+int cv_renderscene_del(RenderScene *S)
+{
+  free(S);
+  return 0;
+}
 
 ImagePlane *cv_imageplane_new()
 {
@@ -135,6 +163,13 @@ ImagePlane *cv_imageplane_new()
   I->complete = 0;
   ImagePlaneObjects[ImagePlaneObjectCount++] = I;
   return I;
+}
+int cv_imageplane_del(ImagePlane *I)
+{
+  glDeleteTextures(1, &I->id);
+  free(I);
+  --ImagePlaneObjectCount;
+  return 0;
 }
 
 
@@ -167,7 +202,7 @@ int cv_imageplane_from3d(ImagePlane *I, cow_dfield *f, int mem, int ax, int ind)
     cv_error("data member out of range");
     return 1;
   }
-  if (ind < 0 || ind >= na[ax]) {
+  if (ind < 0 || ind >= na[ax]+ng) {
     cv_error("index out of range");
     return 1;
   }
@@ -283,14 +318,6 @@ int cv_imageplane_from3d(ImagePlane *I, cow_dfield *f, int mem, int ax, int ind)
   glBindTexture(GL_TEXTURE_2D, 0);
 
   free(texture_data);
-  return 0;
-}
-
-int cv_imageplane_del(ImagePlane *I)
-{
-  glDeleteTextures(1, &I->id);
-  free(I);
-  --ImagePlaneObjectCount;
   return 0;
 }
 

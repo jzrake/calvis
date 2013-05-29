@@ -3,11 +3,6 @@ MAKEFILE_IN = $(PWD)/Makefile.in
 include $(MAKEFILE_IN)
 
 CFLAGS   ?= -Wall
-CURL     ?= curl
-UNTAR    ?= tar -xvf
-CD       ?= cd
-RM       ?= rm -f
-OS       ?= generic
 
 LOCLIBS = src/libcalvis.a cow/libcow.a
 
@@ -23,7 +18,7 @@ default : bin/calvis
 
 bin/calvis : $(LOCLIBS)
 	@mkdir -p bin
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+	$(CXX) $(CFLAGS) -o $@ $^ $(LIBS)
 
 src/libcalvis.a : .FORCE
 	$(MAKE) -C src
@@ -33,6 +28,7 @@ cow/libcow.a : .FORCE
 
 clean :
 	$(MAKE) -C cow clean MAKEFILE_IN=$(MAKEFILE_IN)
+	$(MAKE) -C src clean MAKEFILE_IN=$(MAKEFILE_IN)
 	$(RM) bin/calvis
 
 .FORCE :
