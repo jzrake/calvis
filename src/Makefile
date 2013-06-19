@@ -2,15 +2,20 @@
 ARSTATIC ?= $(AR) rcu
 RANLIB ?= ranlib
 
-default : libcalvis.a
+CXXFLAGS ?= -Wall -O2
 
-libcalvis.a : cv.o
+CXX_SRC = $(wildcard *.cpp)
+CXX_OBJ = $(CXX_SRC:.cpp=.o)
+
+default : libcalvis.a
+show :
+	@echo "src files: $(CXX_SRC)"
+	@echo "obj files: $(CXX_OBJ)"
+libcalvis.a : $(CXX_OBJ)
 	$(ARSTATIC) $@ $?
 	$(RANLIB) $@
-
-cv.o : cv.cpp
-	$(CXX) -c -o $@ $^ -I/usr/X11R6/include
-
+%.o : %.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $^ -I/usr/X11R6/include
 clean :
 	$(RM) *.o libcalvis.a
 

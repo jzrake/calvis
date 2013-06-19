@@ -1,0 +1,5 @@
+/Makefile.in
+/src/cvRenderWindowGLUT.o
+/src/cvTeapotGLUT.o
+/src/libcalvis.a
+/src/cv.o

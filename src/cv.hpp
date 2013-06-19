@@ -1,59 +1,32 @@
+#ifndef __CV_cv_HEADER
+#define __CV_cv_HEADER
 
-#include <list>
+class cvObject;
+class cvRenderWindow;
+class cvSceneElement;
 
 class cvObject
 {
 
 } ;
 
-class cvKeyboardResponsiveObject : public cvObject
+class cvRenderWindow : public cvObject
 {
 public:
-  virtual ~cvKeyboardResponsiveObject() { }
-  virtual int respond_to_key(unsigned char key, int x, int y) = 0;
-} ;
-
-class cvRenderableObject : public cvObject
-{
-public:
-  virtual ~cvRenderableObject() { }
+  virtual void add_element(cvSceneElement *e) = 0;
   virtual void render() = 0;
 } ;
 
-class cvRenderableKeyboardResponsiveObject : public cvRenderableObject,
-					     public cvKeyboardResponsiveObject
+class cvSceneElement : public cvObject
 {
 public:
-  virtual ~cvRenderableKeyboardResponsiveObject() { }
+  virtual int respond_to_key(unsigned char key, int x, int y) = 0;
+  virtual void render() = 0;
 } ;
 
-class cvRenderWindow : public cvObject
-{
-private:
-  std::list<cvRenderableObject*> ObjectList;
-  double TranslateZ;
-  double RotationX;
-  double RotationY;
-public:
-  cvRenderWindow();
-  virtual ~cvRenderWindow();
-  int DisplayFunc();
-  int IdleFunc();
-  int ReshapeFunc(int Width, int Height);
-  int KeyboardFunc(unsigned char key, int x, int y);
-  int SpecialFunc(int key, int x, int y);
-  template <class T> T *new_object()
-  {
-    T *object = new T;
-    ObjectList.push_back(object);
-    return object;
-  }
-} ;
+class cvDataSource : public cvObject { } ;
+class cvImagePlane : public cvObject { } ;
+class cvPointwiseTransform : public cvObject { } ;
+class cvPlaneExtraction : public cvObject { } ;
 
-class cvTeapot : public cvRenderableKeyboardResponsiveObject
-{
-public:
-  virtual ~cvTeapot() { }
-  int respond_to_key(unsigned char key, int x, int y);
-  void render();
-} ;
+#endif // __CV_cv_HEADER
